@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIRST Value · Property Assessment Console</title>
+<meta name="description" content="Concept prototype by Team Sapiens (DMS, IIT Delhi) for FAME 6.0, Problem Statement 1: AI-led property assessment for Loan Against Property.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--m:#560F13;--m2:#7A1E24;--m3:#93353B;--g:#C9A04A;--gd:#8A6518;--gl:#F7EEDC;--s:#FBF6F3;--ink:#1A1A1A;--line:#E6DAD3;--green:#2E7D4F;--amber:#B9770E;--red:#B3261E;--w:#fff}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--s);color:var(--ink);font-family:"Times New Roman",Times,serif;font-size:16px}
+a{color:var(--m)}
+header{background:var(--m);color:var(--w);padding:18px 32px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+header .brand{font-size:28px;font-weight:700;letter-spacing:.3px}
+header .brand span{color:var(--g)}
+header .sub{font-size:17px;color:#F7EEDC}
+header .tag{margin-left:auto;border:1px solid var(--g);color:var(--g);padding:5px 12px;border-radius:999px;font-size:14px}
+nav{background:var(--w);border-bottom:1px solid var(--line);display:flex;gap:4px;padding:0 24px;overflow-x:auto;position:sticky;top:0;z-index:5}
+nav button{font-family:inherit;font-size:16.5px;background:none;border:0;border-bottom:3px solid transparent;padding:14px 16px;color:var(--ink);cursor:pointer;white-space:nowrap}
+nav button.on{border-color:var(--m);color:var(--m);font-weight:700}
+main{max-width:1280px;margin:0 auto;padding:24px 24px 48px}
+section{display:none}section.on{display:block}
+h2{font-size:26px;color:var(--m);margin:6px 0 4px}
+.lead{font-size:17px;margin:0 0 18px;max-width:900px}
+.grid{display:grid;gap:16px}
+.k4{grid-template-columns:repeat(4,1fr)}.k3{grid-template-columns:repeat(3,1fr)}.k2{grid-template-columns:1.25fr 1fr}
+.card{background:var(--w);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:0 1px 2px rgba(86,15,19,.05)}
+.card h3{margin:0 0 10px;font-size:19px;color:var(--m)}
+.kpi .v{font-size:36px;font-weight:700;color:var(--m);line-height:1.1}
+.kpi .l{font-size:15.5px;margin-top:4px}
+.kpi .d{font-size:14.5px;margin-top:8px;color:var(--green);font-weight:700}
+.flow{display:flex;align-items:stretch;gap:0;margin-top:6px;flex-wrap:wrap}
+.flow .st{flex:1;min-width:120px;background:var(--gl);border:1px solid var(--g);padding:12px 12px;position:relative;margin-right:14px;border-radius:8px}
+.flow .st:after{content:"";position:absolute;right:-12px;top:50%;transform:translateY(-50%);border-left:10px solid var(--g);border-top:8px solid transparent;border-bottom:8px solid transparent}
+.flow .st:last-child:after{display:none}
+.flow .st b{display:block;font-size:22px;color:var(--m)}
+.flow .st span{font-size:14.5px}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13.5px;font-weight:700;color:#fff}
+.G{background:var(--green)}.A{background:var(--amber)}.R{background:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:15.5px}
+th{background:var(--m);color:#fff;text-align:left;padding:9px 10px;font-weight:700}
+td{border-bottom:1px solid var(--line);padding:9px 10px;vertical-align:top}
+.lane{display:grid;grid-template-columns:210px 1fr;align-items:center;border-bottom:1px dashed var(--line);min-height:46px}
+.lane .who{font-weight:700;color:var(--m);font-size:15.5px;padding-right:8px}
+.track{position:relative;height:46px}
+.bar{position:absolute;top:9px;height:28px;border-radius:5px;font-size:13px;color:#fff;padding:5px 7px;white-space:nowrap;overflow:hidden}
+.bar.work{background:var(--m)}.bar.wait{background:repeating-linear-gradient(45deg,#E9C9C6,#E9C9C6 6px,#F4E1DF 6px,#F4E1DF 12px);color:var(--m);font-weight:700}
+.bar.ai{background:var(--g);color:#1A1A1A}
+.axis{display:grid;grid-template-columns:210px 1fr;font-size:13.5px}
+.axis .ticks{position:relative;height:22px}
+.axis .ticks span{position:absolute;transform:translateX(-50%)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:14.5px;margin-top:10px}
+.legend i{display:inline-block;width:16px;height:12px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.steps button{font-family:inherit;font-size:15px;border:1px solid var(--m);background:var(--w);color:var(--m);padding:8px 12px;border-radius:999px;cursor:pointer}
+.steps button.on{background:var(--m);color:#fff}
+.steps button.done{background:var(--gl)}
+select,input[type=range]{font-family:inherit;font-size:16px}input[type=range]{accent-color:#560F13;width:100%}
+select{padding:8px 10px;border:1px solid var(--m);border-radius:8px;color:var(--m);background:#fff}
+.btn{font-family:inherit;font-size:16px;background:var(--m);color:#fff;border:0;border-radius:8px;padding:9px 16px;cursor:pointer}
+.btn.gold{background:var(--g);color:#1A1A1A}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+.chk .ic{font-weight:700;width:22px;text-align:center}
+.ok{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}
+#kg{border:1px solid var(--line);border-radius:10px;background:linear-gradient(180deg,#fff,#FBF6F3)}#kg svg{width:100%;height:auto;display:block}.kgl{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;margin-top:10px}.kgl i{display:inline-block;width:14px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle}
+.note{font-size:14.5px;font-style:italic}
+.slider{display:grid;grid-template-columns:1fr 90px;gap:8px;align-items:center;margin:8px 0}
+.slider label{font-size:15.5px}
+.slider output{font-weight:700;color:var(--m);text-align:right}
+.big{font-size:30px;font-weight:700;color:var(--m)}
+.logos{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.logos span{border:1px solid var(--line);border-radius:6px;padding:5px 10px;font-size:14px;background:#fff}
+footer{text-align:center;font-size:14px;padding:18px;border-top:1px solid var(--line);background:#fff}
+@media(max-width:900px){.k4,.k3,.k2{grid-template-columns:1fr}.lane,.axis{grid-template-columns:120px 1fr}header{padding:14px 16px}main{padding:16px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">FIRST <span>Value</span></div>
+  <div class="sub">Property Assessment Console for Loan Against Property</div>
+  <div class="tag">Concept prototype · illustrative data · Team Sapiens</div>
+</header>
+<nav id="nav">
+  <button data-t="ov" class="on">1. Portfolio overview</button>
+  <button data-t="asis">2. Today vs FIRST Value</button>
+  <button data-t="case">3. Case journey &amp; knowledge graph</button>
+  <button data-t="wb">4. Valuer workbench</button>
+  <button data-t="biz">5. Business case</button>
+</nav>
+<main>
+
+<!-- 1 OVERVIEW -->
+<section id="ov" class="on">
+  <h2>Every LAP property, assessed the same day it is logged</h2>
+  <p class="lead">This console follows each property from document upload to the valuer's e-signature. Cases are triaged by risk: only Red cases need a field visit.</p>
+  <div class="grid k4">
+    <div class="card kpi"><div class="v">3,000</div><div class="l">properties assessed this month</div><div class="d">Illustrative monthly volume</div></div>
+    <div class="card kpi"><div class="v">2.1 days</div><div class="l">average turnaround per case</div><div class="d">Down from 6.0 days (−65%)</div></div>
+    <div class="card kpi"><div class="v">50%</div><div class="l">cases closed without a field visit</div><div class="d">Today: almost every case gets one</div></div>
+    <div class="card kpi"><div class="v">₹3,966</div><div class="l">all-in cost per case, incl. cost of delay</div><div class="d">Down from ₹9,445 (−58%)</div></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>Where this month's cases are in the pipeline</h3>
+    <div class="flow">
+      <div class="st"><b>3,000</b><span>Logged with documents</span></div>
+      <div class="st"><b>2,990</b><span>Documents read by Document AI</span></div>
+      <div class="st"><b>2,975</b><span>Registry, map and graph checks done</span></div>
+      <div class="st"><b>1,500 · 900 · 575</b><span>Green · Amber · Red</span></div>
+      <div class="st"><b>2,880</b><span>Signed by the valuer</span></div>
+    </div>
+  </div>
+  <div class="grid k3" style="margin-top:16px">
+    <div class="card"><h3>Risk tier mix</h3><canvas id="cTier" height="220"></canvas></div>
+    <div class="card"><h3>Turnaround by tier (days)</h3><canvas id="cTat" height="220"></canvas></div>
+    <div class="card"><h3>Issues flagged on day 0, by type</h3><canvas id="cIss" height="220"></canvas></div>
+  </div>
+</section>
+
+<!-- 2 AS-IS vs TO-BE -->
+<section id="asis">
+  <h2>Today a file passes through 8 people and 9 hand-offs. FIRST Value removes the waiting</h2>
+  <p class="lead">Today's process, reconstructed from the three appraisal reports shared by the bank. Each bar is one step, placed on the day it happens. The hatched bars are waiting time, when nobody is working on the file.</p>
+  <div class="card">
+    <h3>Today: one sample case, about 10 days</h3>
+    <div class="axis"><div></div><div class="ticks" id="tA"></div></div>
+    <div id="laneA"></div>
+    <div class="legend"><span><i style="background:var(--m)"></i>Work being done</span><span><i style="background:#E9C9C6"></i>Waiting in a queue</span></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>FIRST Value: a Green case in under a day; Red cases arrive at site with a checklist</h3>
+    <div class="axis"><div></div><div class="ticks" id="tB"></div></div>
+    <div id="laneB"></div>
+    <div class="legend"><span><i style="background:var(--g)"></i>Done by FIRST Value automatically</span><span><i style="background:var(--m)"></i>Done by a person</span></div>
+  </div>
+</section>
+
+<!-- 3 CASE JOURNEY -->
+<section id="case">
+  <h2>Follow one property from upload to sign-off</h2>
+  <p class="lead">These three cases are rebuilt, with names, reference numbers and coordinates removed, from the sample reports shared with Problem Statement 1. Pick a case and press <b>Run assessment</b>.</p>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+    <select id="caseSel"></select>
+    <button class="btn" id="run">Run assessment</button>
+    <span id="clock" class="note"></span>
+  </div>
+  <div class="steps" id="steps"></div>
+  <div class="grid" style="grid-template-columns:1fr 1.2fr">
+    <div class="card" id="panel" style="min-height:440px"></div>
+    <div class="card"><h3>Property knowledge graph</h3><div id="kg"></div>
+      <p class="note">Every document, owner, survey number, area and rule becomes a linked fact. A red link marks two facts that disagree. That is how a mismatch is caught in minutes, not days.</p></div>
+  </div>
+</section>
+
+<!-- 4 WORKBENCH -->
+<section id="wb">
+  <h2>The valuer sees the exceptions first and signs once</h2>
+  <p class="lead">The report is pre-filled. The valuer reviews only what the system flagged, then e-signs. The valuer stays the accountable signatory.</p>
+  <div class="card">
+    <table id="wbt"><thead><tr><th>Case</th><th>Property</th><th>Tier</th><th>Value band</th><th>Exceptions to review</th><th>Time left</th><th>Action</th></tr></thead><tbody></tbody></table>
+  </div>
+</section>
+
+<!-- 5 BUSINESS CASE -->
+<section id="biz">
+  <h2>Business case: move the sliders and the numbers update</h2>
+  <p class="lead">Today's cost includes the agency fee, re-visits, internal staff time and the cost of delay: interest income the bank does not earn while a sanctioned loan waits on its valuation.</p>
+  <div class="grid k2">
+    <div class="card">
+      <h3>Assumptions</h3>
+      <div class="slider"><label>Valuations per month</label><output id="oVol"></output><input type="range" id="vol" min="1000" max="8000" step="250" value="3000" style="grid-column:1/3"></div>
+      <div class="slider"><label>Share of Green cases</label><output id="oG"></output><input type="range" id="g" min="10" max="70" step="5" value="50" style="grid-column:1/3"></div>
+      <div class="slider"><label>Share of Amber cases</label><output id="oA"></output><input type="range" id="a" min="10" max="50" step="5" value="30" style="grid-column:1/3"></div>
+      <div class="slider"><label>Agency fee per field visit (₹)</label><output id="oF"></output><input type="range" id="fee" min="2000" max="6000" step="250" value="3500" style="grid-column:1/3"></div>
+      <div class="slider"><label>Average LAP ticket (₹ lakh)</label><output id="oT"></output><input type="range" id="tk" min="20" max="150" step="5" value="60" style="grid-column:1/3"></div>
+      <p class="note">Fixed: build cost ₹4.0 Cr, running cost ₹1.2 Cr a year, discount rate 12%, net interest margin 4%. Red cases make up the remainder.</p>
+    </div>
+    <div class="card">
+      <h3>Results</h3>
+      <div class="grid k2" style="grid-template-columns:1fr 1fr">
+        <div><div class="big" id="rCase"></div><div>cost per case: today → FIRST Value</div></div>
+        <div><div class="big" id="rSave"></div><div>direct cash saving per year</div></div>
+        <div><div class="big" id="rPay"></div><div>payback period</div></div>
+        <div><div class="big" id="rNpv"></div><div>3-year NPV (cash savings only)</div></div>
+      </div>
+      <canvas id="cPay" height="200" style="margin-top:14px"></canvas>
+    </div>
+  </div>
+</section>
+</main>
+<footer>FIRST Value is a concept prototype built by Team Sapiens (Pallav Kumar, Tejas Gupta, Deepak Lal; DMS, IIT Delhi) for the FAME 6.0 Open Innovation Challenge. All data is illustrative and anonymised. This is not an IDFC FIRST Bank product.</footer>
+
+<script>
+const C={m:'#560F13',m2:'#7A1E24',g:'#C9A04A',gl:'#F7EEDC',green:'#2E7D4F',amber:'#B9770E',red:'#B3261E',ink:'#1A1A1A'};
+Chart.defaults.font.family='"Times New Roman", Times, serif';Chart.defaults.font.size=14;Chart.defaults.color=C.ink;
+// tabs
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));if(b.dataset.t==='case')setTimeout(drawKG,60)});
+// overview charts
+new Chart(cTier,{type:'doughnut',data:{labels:['Green: desk + remote','Amber: video + desk review','Red: field visit'],datasets:[{data:[50,30,20],backgroundColor:[C.green,C.amber,C.red],borderColor:'#fff',borderWidth:2}]},options:{plugins:{legend:{position:'bottom'}},cutout:'58%'}});
+new Chart(cTat,{type:'bar',data:{labels:['Today','Green','Amber','Red','Blended'],datasets:[{data:[6,1,2,5,2.1],backgroundColor:['#BFA9A6',C.green,C.amber,C.red,C.m]}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#F0E6E1'}},x:{grid:{display:false}}}}});
+new Chart(cIss,{type:'bar',data:{labels:['Area mismatch','Document / title gap','Report QC error','Plan deviation','Valuation rule'],datasets:[{data:[34,27,19,14,6],backgroundColor:C.m}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%'},grid:{color:'#F0E6E1'}},y:{grid:{display:false}}}}});
+
+// AS-IS lanes (days)
+const asis=[
+ ['Customer',[[0,.6,'work','Submits application + property papers'],[6.5,8,'wait','Asked again for sanction map']]],
+ ['Sales / RM',[[0,.8,'work','Collects documents'],[.8,1,'work','Hands over']]],
+ ['Bank operations',[[1,1.6,'work','Logs case, picks agency'],[1.6,2.2,'wait','Allocation queue']]],
+ ['Agency field engineer',[[2.2,3.3,'wait','Schedules visit by phone'],[3.3,3.7,'work','Site visit, measures, photos']]],
+ ['Agency report writer',[[3.7,4.6,'work','Re-types data, drafts 22 sections']]],
+ ['Agency signatory',[[4.6,13.6,'wait','Waits for review and digital signature (9 days)']]],
+ ['Bank technical / credit',[[13.6,14.2,'work','Reviews report'],[14.2,15,'wait','Raises queries']]],
+ ['Legal (parallel)',[[1.6,6.5,'wait','Separate title search: the valuer does not verify title']]]];
+const tobe=[
+ ['Customer / DSA',[[0,.15,'work','Uploads papers + guided video in app']]],
+ ['FIRST Value (auto)',[[.15,.2,'ai','Reads documents'],[.2,.26,'ai','Registry + map + graph checks'],[.26,.3,'ai','Value band + risk tier']]],
+ ['Valuer (Green)',[[.3,.7,'work','Reviews exceptions, e-signs']]],
+ ['Valuer (Amber)',[[.3,1.6,'work','Video review + desk check']]],
+ ['Field visit (Red)',[[.3,4.5,'work','Visit with pre-filled report + issue list']]],
+ ['Bank credit',[[.7,1,'work','Sanction on one standard report']]]];
+function lanes(id,tid,data,max,step){const L=document.getElementById(id),T=document.getElementById(tid);
+ for(let d=0;d<=max;d+=step){const s=document.createElement('span');s.style.left=(d/max*100)+'%';s.textContent='Day '+d;T.appendChild(s)}
+ data.forEach(([who,bars])=>{const r=document.createElement('div');r.className='lane';r.innerHTML=`<div class="who">${who}</div><div class="track"></div>`;const t=r.querySelector('.track');
+  let lo=99,hi=0;bars.forEach(([a,b,k,txt])=>{lo=Math.min(lo,a);hi=Math.max(hi,b);const e=document.createElement('div');e.className='bar '+k;e.style.left=(a/max*100)+'%';e.style.width=Math.max((b-a)/max*100,1.2)+'%';e.title=txt;t.appendChild(e)});
+   const lb=document.createElement('div');const txt=bars.map(x=>x[3]).join('  →  ');lb.textContent=txt;lb.style.cssText='position:absolute;top:13px;font-size:13.5px;white-space:nowrap;color:#1A1A1A';
+   if(hi/max<0.62){lb.style.left=`calc(${hi/max*100}% + 8px)`}else{lb.style.right=`calc(${100-lo/max*100}% + 8px)`;lb.style.textAlign='right'}t.appendChild(lb);L.appendChild(r)})}
+lanes('laneA','tA',asis,15,3);lanes('laneB','tB',tobe,5,1);
+
+// CASES
+const CASES={
+ A:{name:'Case A · Dehradun · Residential, G+2',tier:'R',band:[3.05,3.19,3.32],fsv:'₹2.56 Cr (80%)',today:'10 days, ending in a query to the customer',
+  docs:[['Sale deed (2026)','Owner matches applicant','98%','ok'],['RTI copy','Read','95%','ok'],['Sanctioned map','Not uploaded','–','bad'],['Property tax receipt','Not uploaded','–','warn']],
+  checks:[['ok','Land record','Area and owner match the online revenue record'],['ok','Zoning','Master plan says residential'],['warn','Road widening','Proposed 24 m road cuts the plot from 3,831 to 3,549 sq ft'],['bad','Building vs plan','Built-up 4,278 sq ft vs 3,721 permissible (+15%)'],['ok','Negative / caution area','Not in any flagged zone'],['ok','Existing charge','No mortgage found on the property registry (simulated)']],
+  evidence:'Satellite footprint ≈ 1,300 sq ft × 3 floors + mumty ⇒ ≈ 4,280 sq ft built-up. This matches the site figure in the original report.',
+  why:'Sanction map missing and the building exceeds the permissible area by more than 10%. A field visit is required, with these 3 issues pre-listed.',
+  kg:{nodes:[['P','Property · plot','p'],['O','Applicant','o'],['D','Sale deed 2026','d'],['A1','Plot 3,831 sq ft (deed)','v'],['A2','Net plot 3,549 sq ft','v'],['R','Proposed 24 m road','r'],['B','Building G+2','p'],['B1','Built-up 4,278 sq ft (site)','v'],['B2','Permissible 3,721 sq ft','v'],['Z','Zone: residential','r'],['S','Sanction map','x']],
+   edges:[['O','P','owns'],['D','P','describes'],['D','A1','states'],['R','A2','reduces to'],['A1','A2','conflict',1],['P','B','has'],['B','B1','measured'],['B','B2','allowed'],['B1','B2','+15%',1],['P','Z','zoned'],['S','B','missing',1]]}},
+ B:{name:'Case B · Dehradun · Commercial, stilt + 4 floors',tier:'R',band:[19.2,20.1,21.0],fsv:'₹16.1 Cr (80%)',today:'Report in 1 day; sign-off date not stated',
+  docs:[['Gift deeds ×2 (2024)','Floors 1 and 2 to owner','97%','ok'],['Sale deeds ×3 (2022)','Land to co-owner (spouse)','96%','ok'],['Lease deed (2024)','9-year lease, ₹16 L / month','97%','ok'],['Sanction maps ×2 + letters','One map 74 m off site','93%','warn']],
+  checks:[['ok','Title chain','5 deeds join into one ownership chain; co-owner must also sign'],['warn','Map location','One sanction map\'s coordinates are 74 m from the property'],['bad','Building vs plan','Built-up 24,752 sq ft vs 13,611 sanctioned (+82%)'],['warn','Road widening','190 sq ft shop falls in the road-widening line'],['ok','Zoning','Commercial use allowed'],['ok','Rental income','Lease rent matches a market yield of about 9.5%']],
+  evidence:'Satellite footprint × 5 floors shows the building is far larger than sanctioned. The value is computed on the sanctioned area only.',
+  why:'Commercial property above ₹5 Cr with a major deviation from plan. Field visit plus a second opinion.',
+  kg:{nodes:[['P','Property · plot','p'],['O1','Owner','o'],['O2','Co-owner','o'],['G','Gift deeds ×2','d'],['S3','Sale deeds ×3','d'],['L','Lease to a bank','d'],['M1','Sanction map 1','d'],['M2','Sanction map 2','d'],['B1','Built 24,752 sq ft','v'],['B2','Sanctioned 13,611 sq ft','v'],['X','Location 74 m off','x']],
+   edges:[['G','O1','to'],['S3','O2','to'],['O1','P','co-owns'],['O2','P','co-owns'],['L','P','leases'],['M1','P','plans'],['M2','P','plans'],['M1','X','points to',1],['P','B1','measured'],['P','B2','allowed'],['B1','B2','+82%',1]]}},
+ C:{name:'Case C · Coimbatore · Residential, G+1',tier:'A',band:[3.25,3.40,3.55],fsv:'₹2.89 Cr (85% today, 80% under one bank rule)',today:'18 days from visit to signed report',
+  docs:[['Sale deed (2010)','Lists 1 survey number','97%','ok'],['Patta + FMB sketch','Lists 3 survey numbers','94%','warn'],['Property tax + EB bill','Owner and address match','96%','ok'],['Approved building plan','Not available (village panchayat)','–','warn']],
+  checks:[['warn','Survey numbers','Deed shows 1, patta/FMB show 3: rectification deed needed before disbursal'],['warn','Land area','Deed 6,000 sq ft vs patta 5,920 sq ft: the lower figure is used'],['ok','Guideline rate','₹500 / sq ft found on the state registration portal'],['bad','Report QC','Value in words ("₹55.6 lakh") does not match ₹3.40 Cr; two different visit dates'],['ok','Negative / caution area','Not in any flagged zone'],['ok','Existing charge','No mortgage found on the property registry (simulated)']],
+  evidence:'Guided video confirms G+1 with an overhead tank. Footprint ≈ 3,200 sq ft. Built-up ≈ 5,300 sq ft, which matches.',
+  why:'Clean structure but a fixable title-paper mismatch. Valued remotely; the rectification deed is a condition of disbursal.',
+  kg:{nodes:[['P','Property · plot','p'],['O','Applicant','o'],['D','Sale deed 2010','d'],['PT','Patta + FMB','d'],['S1','Survey no. ×1','v'],['S3','Survey nos. ×3','v'],['A1','6,000 sq ft (deed)','v'],['A2','5,920 sq ft (patta)','v'],['R','Report text','d'],['V1','₹3.40 Cr (figures)','v'],['V2','₹55.6 L (words)','x']],
+   edges:[['O','P','owns'],['D','P','describes'],['PT','P','describes'],['D','S1','lists'],['PT','S3','lists'],['S1','S3','mismatch',1],['D','A1','states'],['PT','A2','states'],['A1','A2','−80 sq ft',1],['R','V1','says'],['R','V2','says'],['V1','V2','conflict',1]]}}};
+const STEPS=['1 · Upload','2 · Read documents','3 · Registry & map checks','4 · Remote evidence','5 · Value & risk tier','6 · Valuer sign-off'];
+const sel=document.getElementById('caseSel');Object.entries(CASES).forEach(([k,c])=>sel.add(new Option(c.name,k)));
+const stepsEl=document.getElementById('steps');STEPS.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s;b.onclick=()=>show(i);stepsEl.appendChild(b)});
+const tierName={G:'GREEN',A:'AMBER',R:'RED'};
+function show(i){const c=CASES[sel.value],P=document.getElementById('panel');[...stepsEl.children].forEach((b,j)=>{b.classList.toggle('on',j===i);b.classList.toggle('done',j<i)});
+ let h='';
+ if(i===0)h=`<h3>Customer or DSA uploads the papers and records a guided video in the app</h3><p>${c.docs.length} document sets received. Each upload is time-stamped and geo-tagged. Missing items are requested at once, not after the site visit.</p>`+
+  `<table><tr><th>Document</th><th>Status</th></tr>${c.docs.map(d=>`<tr><td>${d[0]}</td><td class="${d[3]}">${d[2]==='–'?'Missing: requested on day 0':'Received'}</td></tr>`).join('')}</table>`;
+ if(i===1)h=`<h3>Document AI reads every page and pulls out the facts</h3><table><tr><th>Document</th><th>What was extracted</th><th>Confidence</th></tr>${c.docs.map(d=>`<tr><td>${d[0]}</td><td class="${d[3]}">${d[1]}</td><td>${d[2]}</td></tr>`).join('')}</table><p class="note">Google Document AI handles text in English and Indian scripts. A LayoutLMv3 model, trained on the bank's past reports, maps each fact to the 22-section report.</p>`;
+ if(i===2)h=`<h3>Every fact is checked against registries, maps and the other documents</h3>${c.checks.map(k=>`<div class="chk"><div class="ic ${k[0]}">${k[0]==='ok'?'✓':k[0]==='warn'?'!':'✕'}</div><div><b>${k[1]}.</b> ${k[2]}</div></div>`).join('')}`;
+ if(i===3)h=`<h3>Remote evidence replaces most site visits</h3><p>${c.evidence}</p><div class="chk"><div class="ic ok">✓</div><div>Video recorded at the plot location (GPS within 15 m), with a live-person check</div></div><div class="chk"><div class="ic ok">✓</div><div>Building footprint taken from open satellite building data</div></div><div class="chk"><div class="ic ok">✓</div><div>Floor count and construction stage confirmed from the video</div></div>`;
+ if(i===4)h=`<h3>Value band and risk tier</h3><p>Estimated market value: <b>₹${c.band[1]} Cr</b> (range ₹${c.band[0]}–${c.band[2]} Cr). Forced-sale value: ${c.fsv}.</p><canvas id="cBand" height="120"></canvas><p style="margin-top:14px">Risk tier: <span class="pill ${c.tier}">${tierName[c.tier]}</span></p><p>${c.why}</p>`;
+ if(i===5)h=`<h3>The valuer reviews the exceptions and e-signs</h3><p>Exceptions to review: <b>${c.checks.filter(k=>k[0]!=='ok').length+c.docs.filter(d=>d[3]!=='ok').length}</b>. Everything else is pre-filled and already checked.</p><table><tr><th></th><th>Today</th><th>With FIRST Value</th></tr><tr><td>Turnaround</td><td>${c.today}</td><td>${c.tier==='G'?'Under 1 day':c.tier==='A'?'Within 48 hours':'3–5 days, with issues known on day 0'}</td></tr><tr><td>People touching the file</td><td>8</td><td>${c.tier==='R'?'4':'3'}</td></tr><tr><td>Times data is typed in</td><td>3</td><td>0: read once, used everywhere</td></tr></table><p style="margin-top:12px"><button class="btn gold" onclick="this.textContent='Signed with Aadhaar eSign ✓';this.disabled=true">E-sign report</button></p>`;
+ P.innerHTML=h;
+ if(i===4){new Chart(document.getElementById('cBand'),{type:'bar',data:{labels:['Low','Most likely','High'],datasets:[{data:c.band,backgroundColor:[C.gl,C.m,C.gl],borderColor:C.g,borderWidth:1}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{min:c.band[0]*0.95,ticks:{callback:v=>'₹'+(+v).toFixed(1)+' Cr'}}}}})}
+ highlight(i)}
+
+function drawKG(){const c=CASES[sel.value].kg,W=740,H=440;
+ const cols={o:[],d:[],p:[],v:[],x:[],r:[]};c.nodes.forEach(n=>cols[n[2]].push(n));
+ const pos={};const place=(arr,x,y0,y1)=>arr.forEach((n,i)=>pos[n[0]]={x,y:arr.length===1?(y0+y1)/2:y0+(y1-y0)*i/(arr.length-1),n});
+ place(cols.d,92,80,360);place(cols.p,310,150,290);place(cols.v.concat(cols.x),530,40,400);
+ cols.o.forEach((n,i)=>pos[n[0]]={x:310+(i-(cols.o.length-1)/2)*170,y:38,n});
+ cols.r.forEach((n,i)=>pos[n[0]]={x:310+(i-(cols.r.length-1)/2)*170,y:404,n});
+ const sty={p:['#560F13','#560F13','#fff'],o:['#FFFFFF','#560F13','#560F13'],d:['#F7EEDC','#C9A04A','#1A1A1A'],v:['#FFFFFF','#B8A49F','#1A1A1A'],x:['#FDECEA','#B3261E','#B3261E'],r:['#EAF4EE','#2E7D4F','#1F5E3A']};
+ const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ let e='',lab='';
+ c.edges.forEach(([a,b,l,bad])=>{const A=pos[a],B=pos[b];if(!A||!B)return;let d,mx,my;
+  if(Math.abs(A.x-B.x)<5){const off=bad?95:70;d=`M${A.x+80},${A.y} C${A.x+80+off},${A.y} ${B.x+80+off},${B.y} ${B.x+80},${B.y}`;mx=A.x+80+off*0.75;my=(A.y+B.y)/2}
+  else{const dx=(B.x-A.x)/2;const sx=A.x+(B.x>A.x?78:-78),ex=B.x+(B.x>A.x?-78:78);d=`M${sx},${A.y} C${sx+dx*0.6},${A.y} ${ex-dx*0.6},${B.y} ${ex},${B.y}`;mx=(sx+ex)/2;my=(A.y+B.y)/2}
+  e+=`<path d="${d}" fill="none" stroke="${bad?'#B3261E':'#CDB9B3'}" stroke-width="${bad?2.6:1.4}" ${bad?'stroke-dasharray="6 4"':''}/>`;
+  if(bad)lab+=`<g><rect x="${mx-38}" y="${my-11}" width="76" height="22" rx="11" fill="#B3261E"/><text x="${mx}" y="${my+5}" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">${esc(l)}</text></g>`});
+ let nd='';Object.values(pos).forEach(({x,y,n})=>{const [f,st,tc]=sty[n[2]];const w=156,h=n[2]==='p'?46:36;
+  nd+=`<g><rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="${n[2]==='p'?10:8}" fill="${f}" stroke="${st}" stroke-width="${n[2]==='x'?2:1.3}"/>`+
+  `<text x="${x}" y="${y+5}" text-anchor="middle" font-size="${n[2]==='p'?15:13.5}" fill="${tc}" font-weight="${n[2]==='p'||n[2]==='x'?700:400}">${esc(n[1])}</text></g>`});
+ document.getElementById('kg').innerHTML=`<svg viewBox="0 0 ${W} ${H}" font-family="Times New Roman, Times, serif">${e}${nd}${lab}</svg>`+
+  `<div class="kgl" style="padding:0 12px 10px"><span><i style="background:#F7EEDC;border:1px solid #C9A04A"></i>Document</span><span><i style="background:#560F13"></i>Property</span><span><i style="background:#fff;border:1px solid #B8A49F"></i>Extracted fact</span><span><i style="background:#EAF4EE;border:1px solid #2E7D4F"></i>Rule or registry</span><span><i style="background:#B3261E"></i>Conflict found</span></div>`}
+function highlight(){}
+sel.onchange=()=>{drawKG();show(0);document.getElementById('clock').textContent=''};
+document.getElementById('run').onclick=()=>{let i=0;const times=['00:00','00:03','00:09','00:21','00:24','00:26'];const tick=()=>{show(i);document.getElementById('clock').textContent='Elapsed: '+times[i]+' (hh:mm)';if(++i<6)setTimeout(tick,1300)};tick()};
+drawKG();show(0);
+
+// WORKBENCH
+const wb=[['LAP-DDN-01','Dehradun · residential','R','₹3.05–3.32 Cr','Sanction map missing · +15% built-up · road widening','Visit today'],
+ ['LAP-DDN-02','Dehradun · commercial','R','₹19.2–21.0 Cr','+82% built-up · map 74 m off · co-owner consent','Visit + 2nd opinion'],
+ ['LAP-CBE-03','Coimbatore · residential','A','₹3.25–3.55 Cr','Survey-no. mismatch · area 6,000 vs 5,920','31 h'],
+ ['LAP-JPR-11','Jaipur · residential','G','₹1.42–1.51 Cr','None','5 h'],
+ ['LAP-PUN-07','Pune · residential flat','G','₹0.96–1.02 Cr','None','7 h'],
+ ['LAP-LKO-04','Lucknow · shop-cum-residence','A','₹2.10–2.28 Cr','Mixed use: confirm on video','40 h']];
+document.querySelector('#wbt tbody').innerHTML=wb.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td><span class="pill ${r[2]}">${tierName[r[2]]}</span></td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td><button class="btn" style="padding:5px 10px;font-size:14px" onclick="this.textContent='${r[2]==='R'?'Visit scheduled':'E-signed ✓'}';this.disabled=true">${r[2]==='R'?'Schedule visit':'Review & sign'}</button></td></tr>`).join('');
+
+// BUSINESS CASE (same model as the deck)
+let payChart;
+function calc(){const vol=+document.getElementById('vol').value,g=+document.getElementById('g').value/100;let a=+document.getElementById('a').value/100;if(g+a>0.95)a=0.95-g;const r=1-g-a;const fee=+document.getElementById('fee').value,tk=+document.getElementById('tk').value*1e5;
+ oVol.textContent=vol.toLocaleString('en-IN');oG.textContent=Math.round(g*100)+'%';oA.textContent=Math.round(a*100)+'%';oF.textContent='₹'+fee.toLocaleString('en-IN');oT.textContent='₹'+(tk/1e5)+' L';
+ const day=tk*0.04/365,HR=500,RW=2000;
+ const todayCash=fee+0.25*RW+3*HR,todayAll=todayCash+6*day;
+ const tier={G:[350+1000+0.5*HR,1*day],A:[450+1800+1*HR,2*day],R:[350+fee+0.1*RW+1.5*HR,5*day]};
+ const fCash=g*tier.G[0]+a*tier.A[0]+r*tier.R[0],fAll=fCash+g*tier.G[1]+a*tier.A[1]+r*tier.R[1];
+ const yr=vol*12,sav=(todayCash-fCash)*yr/1e7,CAP=4,RUN=1.2;
+ const cfs=[-CAP,0.3*sav-RUN,sav-RUN,sav-RUN],npv=cfs.reduce((s,c,i)=>s+c/Math.pow(1.12,i),0);
+ let cum=-CAP,pb=null;const ser=[];for(let m=1;m<=36;m++){const rp=m<=3?0:Math.min(1,(m-3)/6);cum+=rp*sav/12-RUN/12;ser.push(+cum.toFixed(2));if(pb===null&&cum>=0)pb=m}
+ rCase.textContent='₹'+Math.round(todayAll).toLocaleString('en-IN')+' → ₹'+Math.round(fAll).toLocaleString('en-IN');
+ rSave.textContent='₹'+sav.toFixed(1)+' Cr';rPay.textContent=pb?pb+' months':'> 36 months';rNpv.textContent='₹'+npv.toFixed(1)+' Cr';
+ if(payChart)payChart.destroy();
+ payChart=new Chart(cPay,{type:'line',data:{labels:ser.map((_,i)=>'M'+(i+1)),datasets:[{label:'Cumulative cash (₹ Cr)',data:ser,borderColor:C.m,backgroundColor:'rgba(201,160,74,.18)',fill:true,pointRadius:0,tension:.25}]},options:{plugins:{legend:{display:false},title:{display:true,text:'Cumulative net cash, ₹ Cr (break-even where the line crosses 0)'}},scales:{y:{grid:{color:'#F0E6E1'}},x:{grid:{display:false},ticks:{maxTicksLimit:12}}}}})}
+['vol','g','a','fee','tk'].forEach(id=>document.getElementById(id).oninput=calc);calc();
+// deep links: #ov #asis #case #case-3 (step) #wb #biz
+(function(){const h=location.hash.slice(1);if(!h)return;const [t,st]=h.split('-');const b=document.querySelector(`#nav button[data-t="${t}"]`);if(b){b.click();if(t==='case'&&st)setTimeout(()=>show(+st),120)}})();
+</script>
+</body>
+</html>
